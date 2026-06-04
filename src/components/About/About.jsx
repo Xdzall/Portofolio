@@ -33,7 +33,7 @@ const highlights = [
       </svg>
     ),
     label: 'Languages',
-    value: 'Indonesian (Fluent)',
+    value: 'Indonesian (Native)',
     detail: 'English (Intermediate)',
   },
   {
