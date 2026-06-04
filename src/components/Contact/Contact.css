@@ -1,0 +1,121 @@
+.contact__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.contact__info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contact__card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: all var(--transition);
+  text-decoration: none;
+  color: inherit;
+}
+
+.contact__card:hover {
+  border-color: var(--color-primary);
+  transform: translateX(4px);
+  box-shadow: var(--color-card-hover-shadow);
+  color: inherit;
+}
+
+.contact__card-icon {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-glow);
+  border-radius: var(--radius-sm);
+  color: var(--color-primary-light);
+}
+
+.contact__card-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-text-dim);
+  margin-bottom: 2px;
+}
+
+.contact__card-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-white);
+}
+
+.contact__cta {
+  display: flex;
+  align-items: stretch;
+}
+
+.contact__cta-inner {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact__cta-inner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+}
+
+.contact__cta-icon {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-glow);
+  border-radius: 50%;
+  color: var(--color-primary-light);
+  margin-bottom: 4px;
+}
+
+.contact__cta-inner h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.contact__cta-inner p {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  max-width: 320px;
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .contact__grid {
+    grid-template-columns: 1fr;
+  }
+}

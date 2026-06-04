@@ -1,0 +1,219 @@
+.code-editor {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  transition: all var(--transition);
+  width: 100%;
+  max-width: 520px;
+}
+
+.code-editor:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--color-card-hover-shadow);
+}
+
+.code-editor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.code-editor__dots {
+  display: flex;
+  gap: 6px;
+}
+
+.code-editor__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.code-editor__dot--red { background: #ff5f57; }
+.code-editor__dot--yellow { background: #febc2e; }
+.code-editor__dot--green { background: #28c840; }
+
+.code-editor__title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.code-editor__lang {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-dim);
+  background: var(--color-primary-glow);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-tag-border);
+}
+
+.code-editor__body {
+  display: flex;
+  padding: 14px 0;
+  min-height: 300px;
+  max-height: 380px;
+  overflow: hidden;
+}
+
+.code-editor__lines {
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px 0 12px;
+  border-right: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.65;
+  color: var(--color-text-dim);
+  user-select: none;
+  flex-shrink: 0;
+  min-width: 32px;
+  text-align: right;
+}
+
+.line-active {
+  color: var(--color-primary-light);
+}
+
+.code-editor__code {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  line-height: 1.65;
+  color: var(--color-text);
+  padding: 0 14px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.code-line {
+  min-height: 1.65em;
+}
+
+.code-line code {
+  white-space: pre;
+}
+
+.code-keyword { color: #c678dd; }
+.code-type { color: #e5c07b; }
+.code-string { color: #98c379; }
+.code-function { color: #61afef; }
+.code-comment { color: #5c6370; font-style: italic; }
+
+.code-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--color-primary-light);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.code-editor__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-border);
+}
+
+.code-editor__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-dim);
+}
+
+.code-editor__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.code-editor__encoding {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-dim);
+}
+
+[data-theme="light"] .code-keyword { color: #a626a4; }
+[data-theme="light"] .code-type { color: #c18401; }
+[data-theme="light"] .code-string { color: #50a14f; }
+[data-theme="light"] .code-function { color: #4078f2; }
+[data-theme="light"] .code-comment { color: #a0a1a7; }
+[data-theme="light"] .code-editor__code { color: #383a42; }
+
+@media (max-width: 968px) {
+  .code-editor {
+    max-width: 100%;
+  }
+
+  .code-editor__body {
+    min-height: 240px;
+    max-height: 280px;
+  }
+
+  .code-editor__code {
+    font-size: 0.65rem;
+    line-height: 1.55;
+    padding: 0 10px;
+  }
+
+  .code-editor__lines {
+    font-size: 0.6rem;
+    line-height: 1.55;
+    padding: 0 8px 0 10px;
+    min-width: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .code-editor__body {
+    min-height: 200px;
+    max-height: 240px;
+    padding: 10px 0;
+  }
+
+  .code-editor__code {
+    font-size: 0.58rem;
+    line-height: 1.5;
+    padding: 0 8px;
+  }
+
+  .code-editor__lines {
+    font-size: 0.55rem;
+    line-height: 1.5;
+    padding: 0 6px 0 8px;
+    min-width: 24px;
+  }
+
+  .code-editor__header {
+    padding: 8px 10px;
+  }
+
+  .code-editor__footer {
+    padding: 5px 10px;
+  }
+
+  .code-editor__dot {
+    width: 8px;
+    height: 8px;
+  }
+}

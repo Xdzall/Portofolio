@@ -1,0 +1,141 @@
+.experience__timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.experience__item {
+  display: flex;
+  gap: 32px;
+  position: relative;
+}
+
+.experience__marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 6px;
+}
+
+.experience__dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-glow);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.experience__line {
+  width: 2px;
+  flex: 1;
+  background: linear-gradient(to bottom, var(--color-primary), var(--color-border));
+  margin-top: -2px;
+}
+
+.experience__item:last-child .experience__line {
+  display: none;
+}
+
+.experience__card {
+  flex: 1;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  margin-bottom: 24px;
+  transition: all var(--transition);
+}
+
+.experience__card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--color-card-hover-shadow);
+}
+
+.experience__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.experience__role {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-white);
+  margin-bottom: 4px;
+}
+
+.experience__company {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-primary-light);
+}
+
+.experience__period {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--color-text-dim);
+  background: var(--color-bg-alt);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.experience__points {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.experience__points li {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  padding-left: 20px;
+  position: relative;
+}
+
+.experience__points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.experience__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .experience__item {
+    gap: 16px;
+  }
+
+  .experience__marker {
+    display: none;
+  }
+
+  .experience__card {
+    padding: 20px;
+  }
+
+  .experience__header {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
