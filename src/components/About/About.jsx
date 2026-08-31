@@ -1,136 +1,101 @@
-import { useEffect, useRef } from 'react';
-import { education } from '../../data/resume';
-import './About.css';
-
-const highlights = [
-  {
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-        <path d="M6 12v5c3 3 6 3 6 3s3 0 6-3v-5" />
-      </svg>
-    ),
-    label: 'Education',
-    value: education.degree,
-    detail: `${education.institution} | ${education.gpa}`,
-  },
-  {
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-      </svg>
-    ),
-    label: 'Specialization',
-    value: 'Full Stack Development',
-    detail: 'Frontend, Backend & Mobile',
-  },
-  {
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 6v6l4 2" />
-      </svg>
-    ),
-    label: 'Languages',
-    value: 'Indonesian (Native)',
-    detail: 'English (Intermediate)',
-  },
-  {
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-        <line x1="12" y1="22.08" x2="12" y2="12" />
-      </svg>
-    ),
-    label: 'Server',
-    value: 'IIS, VPS, Linux Ubuntu',
-    detail: 'Deployment & Configuration',
-  },
-];
+import React, { useState } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { profile, education } from '../../data/resume.js';
 
 export default function About() {
-  const ref = useRef(null);
+  const [imgError, setImgError] = useState(false);
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) el.classList.add('visible');
-      },
-      { threshold: 0.15 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const stats = [
+    { label: 'Projects', value: '5+' },
+    { label: 'Languages', value: '8+' },
+    { label: 'Industry Exp', value: '1 yr' },
+    { label: 'GPA', value: education?.gpa?.split(' ')?.[0] || '3.56' },
+  ];
 
   return (
-    <section className="about section" id="about">
-      <div className="container fade-in" ref={ref}>
-        <span className="section-label">About Me</span>
-        <h2 className="section-title">Who I Am</h2>
-        <p className="section-subtitle">
-          A passionate developer who thrives at the intersection of design and engineering.
-        </p>
+    <section id="about" className="py-24 bg-[#0a0a0f] relative overflow-hidden" ref={ref}>
+      {/* Subtle background glow */}
+      <div className="absolute top-1/2 left-0 w-96 h-96 bg-[#6c63ff]/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2"></div>
+      
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="flex flex-col md:flex-row items-center gap-12 md:gap-16"
+        >
+          {/* Left: Avatar / Photo */}
+          <div className="w-full md:w-5/12 flex justify-center">
+            <div className="relative group">
+              {/* Outer decorative ring & glow */}
+              <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-tr from-[#6c63ff] via-[#a855f7] to-[#00d4aa] opacity-75 blur-md group-hover:opacity-100 transition duration-500 group-hover:scale-105"></div>
+              
+              <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-3xl bg-[#12121a] border border-[#2a2a3a] p-3 overflow-hidden shadow-2xl">
+                {!imgError ? (
+                  <img 
+                    src="/images/profile.jpg" 
+                    alt={profile?.name || "Muhammad Ghazali Nur Rahman"} 
+                    onError={() => setImgError(true)}
+                    className="w-full h-full object-cover rounded-2xl shadow-inner transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-2xl bg-gradient-to-br from-[#1a1a26] to-[#0a0a0f] flex flex-col items-center justify-center border border-[#2a2a3a]">
+                    <span className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#6c63ff] to-[#00d4aa]">
+                      GH
+                    </span>
+                    <span className="text-xs text-[#a1a1aa] mt-2 font-mono">{profile?.title}</span>
+                  </div>
+                )}
 
-        <div className="about__grid">
-          <div className="about__photo-col">
-            <div className="about__photo-wrapper">
-              <div className="about__photo">
-                {/* Replace src with your photo path: /images/profile.jpg */}
-                <img
-                  src="/images/profile.jpg"
-                  alt="Muhammad Ghazali Nur Rahman"
-                  className="about__photo-img"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-                <div className="about__photo-fallback" style={{ display: 'none' }}>
-                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.3">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                  <span className="about__photo-label">Your Photo</span>
+                {/* Floating badge */}
+                <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-[#0a0a0f]/90 border border-[#00d4aa]/40 backdrop-blur-md flex items-center gap-2 shadow-lg">
+                  <span className="w-2 h-2 rounded-full bg-[#00d4aa] animate-pulse"></span>
+                  <span className="text-xs font-mono text-[#e4e4e7]">PENS Student</span>
                 </div>
               </div>
-              <div className="about__photo-ring" />
             </div>
           </div>
 
-          <div className="about__content">
-            <div className="about__text">
+          {/* Right: Content */}
+          <div className="w-full md:w-7/12">
+            <div className="flex items-center gap-4 mb-4">
+              <span className="text-xs font-mono text-[#00d4aa] uppercase tracking-widest">About Me</span>
+              <div className="h-[1px] w-12 bg-[#2a2a3a]"></div>
+            </div>
+            
+            <h2 className="text-3xl md:text-4xl font-bold text-[#e4e4e7] mb-6 leading-tight">
+              Passionate Full Stack Developer & Tech Enthusiast
+            </h2>
+            
+            <div className="space-y-4 text-[#a1a1aa] mb-10 text-base md:text-lg leading-relaxed">
               <p>
-                I'm a Diploma student in Informatics Engineering at PENS with hands-on
-                experience building production-grade web applications. My work spans
-                from monitoring dashboards to material control systems and
-                NLP-powered recommendation engines.
+                Hello! I'm <strong className="text-[#e4e4e7]">{profile?.name}</strong>, an Informatics Engineering student at <strong className="text-[#00d4aa]">{education?.institution || 'PENS'}</strong> with a GPA of <strong className="text-[#00d4aa]">{education?.gpa || '3.56 / 4.0'}</strong>.
               </p>
               <p>
-                I believe great software starts with understanding the problem deeply,
-                then choosing the right architecture to solve it cleanly. I enjoy
-                working across the full stack — from crafting responsive UIs to
-                designing robust backends.
+                I have a strong foundation in full-stack development, spanning modern frontend frameworks, scalable backend architectures, and database systems. Having developed production-level monitoring dashboards at <span className="text-[#e4e4e7]">PT Panasonic</span> and built AI/NLP powered web apps, I strive to deliver performant and intuitive digital experiences.
               </p>
             </div>
 
-            <div className="about__cards">
-              {highlights.map((item) => (
-                <div className="about__card" key={item.label}>
-                  <div className="about__card-icon">{item.icon}</div>
-                  <div>
-                    <h4 className="about__card-label">{item.label}</h4>
-                    <p className="about__card-value">{item.value}</p>
-                    <p className="about__card-detail">{item.detail}</p>
-                  </div>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {stats.map((stat, idx) => (
+                <div 
+                  key={idx} 
+                  className="bg-[#12121a]/80 backdrop-blur-sm border border-[#2a2a3a] rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-lg hover:border-[#6c63ff]/50 hover:bg-[#1a1a26] transition-all group"
+                >
+                  <span className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#6c63ff] to-[#00d4aa] mb-1 group-hover:scale-110 transition-transform">
+                    {stat.value}
+                  </span>
+                  <span className="text-xs text-[#a1a1aa] uppercase tracking-wider font-medium font-mono">
+                    {stat.label}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

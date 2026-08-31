@@ -1,4 +1,4 @@
-import { ThemeProvider } from './context/ThemeContext';
+import { Suspense } from 'react';
 import Navbar from './components/Navbar/Navbar';
 import Hero from './components/Hero/Hero';
 import About from './components/About/About';
@@ -10,17 +10,19 @@ import Footer from './components/Footer/Footer';
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <Navbar />
-      <main>
-        <Hero />
-        <About />
-        <Experience />
-        <Projects />
-        <Skills />
-        <Contact />
-      </main>
-      <Footer />
-    </ThemeProvider>
+    <div className="min-h-screen w-full bg-[var(--color-bg-dark)] text-[var(--color-text)] font-sans relative">
+      <Suspense fallback={null}>
+        <Navbar />
+        <main>
+          <Hero />
+          <About />
+          <Experience />
+          <Projects />
+          <Skills />
+          <Contact />
+        </main>
+        <Footer />
+      </Suspense>
+    </div>
   );
 }
