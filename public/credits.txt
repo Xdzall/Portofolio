@@ -1,0 +1,9 @@
+PORTFOLIO — MUHAMMAD GHAZALI NUR RAHMAN
+Visual inspiration: Musee by Max Barvian — https://musee.barvian.me/
+Independent portfolio implementation. No source code or proprietary fonts copied.
+Sculpture: Perseus with the Head of Medusa, Antonio Canova, 1804–6.
+The Metropolitan Museum of Art, Fletcher Fund, 1967, accession 67.110.1.
+https://www.metmuseum.org/art/collection/search/204758
+Public-domain collection asset, distributed via The Met 3D viewer (Vntana).
+The marble scan is rendered with a custom dark material in this portfolio.
+Three.js — MIT. Draco decoder — Apache-2.0. Lucide icons — ISC. Inter — SIL Open Font License.
