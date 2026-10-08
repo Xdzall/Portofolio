@@ -4,18 +4,32 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/images/profile.jpg" type="image/jpeg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (() => {
+        let theme;
+        try {
+          theme = localStorage.getItem("ghazali-theme");
+        } catch {}
+        document.documentElement.dataset.theme =
+          theme === "light" || theme === "dark"
+            ? theme
+            : window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+      })();
+    </script>
     <meta
       name="description"
-      content="Portfolio of Muhammad Ghazali Nur Rahman - Full Stack Developer & 3D Enthusiast"
+      content="Muhammad Ghazali Nur Rahman — Full Stack Developer. Explore TapInAja, PT Merdeka Sejahtera, AutoChef, RKD websites, and software development experience at PT Panasonic Manufacturing Indonesia."
     />
     <title>Ghazali | Full Stack Developer</title>
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/inter-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
   </head>
   <body>

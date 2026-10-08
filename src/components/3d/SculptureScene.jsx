@@ -2,34 +2,48 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
-import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { smoothSculpturePelvis } from "./smoothSculpturePelvis.js";
 
-function disposeObject(object) {
-  object.traverse((child) => {
-    if (!child.isMesh) return;
-    child.geometry.dispose();
-    (Array.isArray(child.material) ? child.material : [child.material]).forEach(
-      (material) => {
-        Object.values(material).forEach((value) => {
-          if (value?.isTexture) value.dispose();
-        });
-        material.dispose();
-      },
-    );
+function disposeMaterials(materials) {
+  const textures = new Set();
+  new Set(materials).forEach((material) => {
+    Object.values(material).forEach((value) => {
+      if (value?.isTexture) textures.add(value);
+    });
+    material.dispose();
   });
+  textures.forEach((texture) => texture.dispose());
 }
 
-export default function SculptureScene({ paused }) {
+function disposeObject(object, additionalMaterials = []) {
+  const geometries = new Set(),
+    materials = new Set(additionalMaterials);
+  object.traverse((child) => {
+    if (!child.isMesh) return;
+    geometries.add(child.geometry);
+    (Array.isArray(child.material) ? child.material : [child.material]).forEach(
+      (material) => materials.add(material),
+    );
+  });
+  geometries.forEach((geometry) => geometry.dispose());
+  disposeMaterials(materials);
+}
+
+export default function SculptureScene({ paused, theme = "light" }) {
   const host = useRef(null),
-    pause = useRef(paused);
+    pause = useRef(paused),
+    currentTheme = useRef(theme),
+    applyTheme = useRef(null);
   const [status, setStatus] = useState("loading");
   useEffect(() => {
     pause.current = paused;
   }, [paused]);
+  useEffect(() => {
+    currentTheme.current = theme;
+    applyTheme.current?.(theme);
+  }, [theme]);
   useEffect(() => {
     const container = host.current;
     let disposed = false,
@@ -46,12 +60,33 @@ export default function SculptureScene({ paused }) {
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 0.85;
+    renderer.setClearColor(0x000000, 0);
+    renderer.domElement.tabIndex = 0;
+    renderer.domElement.setAttribute("role", "img");
+    renderer.domElement.setAttribute(
+      "aria-label",
+      "Interactive classical male sculpture. Drag horizontally or use arrow keys to rotate. Press Home to reset the view.",
+    );
     container.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#111315");
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80);
-    camera.position.set(0, 1.4, 6.3);
+    camera.position.set(0, 0.8, 8.3);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0.8, 0);
+    controls.enablePan = false;
+    controls.enableZoom = false;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.075;
+    controls.rotateSpeed = 0.7;
+    controls.minPolarAngle = Math.PI * 0.25;
+    controls.maxPolarAngle = Math.PI * 0.72;
+    controls.autoRotateSpeed = 0.35;
+    controls.cursorStyle = "grab";
+    controls.update();
+    controls.saveState();
+    // Horizontal touch drags orbit; vertical swipes can still scroll the page.
+    renderer.domElement.style.touchAction = "pan-y pinch-zoom";
     const pmrem = new THREE.PMREMGenerator(renderer),
       room = new RoomEnvironment();
     const environment = pmrem.fromScene(room, 0.04);
@@ -61,33 +96,58 @@ export default function SculptureScene({ paused }) {
     const rig = new THREE.Group();
     scene.add(rig);
     const marble = new THREE.MeshStandardMaterial({
-      color: "#12171c",
-      metalness: 0.7,
-      roughness: 0.36,
+      color: "#aaa697",
+      metalness: 0.08,
+      roughness: 0.5,
+      envMapIntensity: 0.55,
     });
     const ring = new THREE.Mesh(
       new THREE.TorusGeometry(1.22, 0.022, 16, 160),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color(3, 3, 3) }),
+      new THREE.MeshBasicMaterial({ color: "#c7af7d", toneMapped: false }),
     );
     ring.position.set(0, 1.9, -0.75);
     ring.rotation.x = 0.13;
     scene.add(ring);
-    scene.add(new THREE.HemisphereLight("#dee9ff", "#080909", 0.55));
-    const key = new THREE.DirectionalLight("#f4f5f6", 4.5);
-    key.position.set(-3, 5, 3);
+    const halo = new THREE.Mesh(
+      new THREE.TorusGeometry(1.22, 0.045, 12, 160),
+      new THREE.MeshBasicMaterial({
+        color: "#167c72",
+        transparent: true,
+        opacity: 0.12,
+        depthWrite: false,
+        toneMapped: false,
+      }),
+    );
+    ring.add(halo);
+    const hemisphere = new THREE.HemisphereLight("#f4f7f2", "#bac5ba", 0.35);
+    scene.add(hemisphere);
+    const key = new THREE.DirectionalLight("#fff0d7", 2.7);
+    key.position.set(-3, 5, 4);
     scene.add(key);
-    const rim = new THREE.DirectionalLight("#d4e2ff", 5);
+    const rim = new THREE.DirectionalLight("#c1eee5", 2.8);
     rim.position.set(2, 3, -3);
     scene.add(rim);
-    const fill = new THREE.DirectionalLight("#ffffff", 0.7);
-    fill.position.set(4, 0, 2);
+    const fill = new THREE.DirectionalLight("#e8f6ef", 0.4);
+    fill.position.set(4, 1.5, 4);
     scene.add(fill);
-    const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(
-      new UnrealBloomPass(new THREE.Vector2(1, 1), 0.12, 0.35, 1.3),
-    );
-    composer.addPass(new OutputPass());
+    const front = new THREE.DirectionalLight("#fffaf0", 0.1);
+    front.position.set(0, 3, 7);
+    scene.add(front);
+    applyTheme.current = (nextTheme) => {
+      const dark = nextTheme === "dark";
+      marble.color.set(dark ? "#b9b3a1" : "#aaa697");
+      renderer.toneMappingExposure = dark ? 0.8 : 0.85;
+      scene.environmentIntensity = dark ? 0.6 : 0.5;
+      hemisphere.intensity = dark ? 0.3 : 0.35;
+      hemisphere.groundColor.set(dark ? "#9fb6ab" : "#bac5ba");
+      fill.intensity = dark ? 0.55 : 0.4;
+      rim.intensity = dark ? 3.3 : 2.8;
+      front.intensity = dark ? 0.15 : 0.1;
+      ring.material.color.set(dark ? "#61c9b3" : "#c7af7d");
+      halo.material.color.set(dark ? "#ddc693" : "#167c72");
+      halo.material.opacity = dark ? 0.24 : 0.12;
+    };
+    applyTheme.current(currentTheme.current);
     const draco = new DRACOLoader().setDecoderPath("/models/draco/");
     const loader = new GLTFLoader().setDRACOLoader(draco);
     loader.load(
@@ -104,92 +164,76 @@ export default function SculptureScene({ paused }) {
         const scale = 6 / size.y;
         sculpture.scale.multiplyScalar(scale);
         sculpture.position.sub(center.multiplyScalar(scale));
+        smoothSculpturePelvis(sculpture);
+        const originalMaterials = new Set();
         sculpture.traverse((child) => {
           if (!child.isMesh) return;
           (Array.isArray(child.material)
             ? child.material
             : [child.material]
-          ).forEach((material) => {
-            Object.values(material).forEach((value) => {
-              if (value?.isTexture) value.dispose();
-            });
-            material.dispose();
-          });
+          ).forEach((material) => originalMaterials.add(material));
           child.material = marble;
         });
+        disposeMaterials(originalMaterials);
         rig.add(sculpture);
         setStatus("ready");
       },
       undefined,
       () => {
-        if (!disposed) setStatus("unavailable");
+        if (!disposed) {
+          renderer.setAnimationLoop(null);
+          setStatus("unavailable");
+        }
       },
     );
-    let mobile = false,
-      progress = 0,
-      targetProgress = 0,
-      sectionTops = [];
-    const pointer = new THREE.Vector2();
     const resize = () => {
-      const width = container.clientWidth,
-        height = container.clientHeight;
-      mobile = width < 700;
+      const width = Math.max(1, container.clientWidth),
+        height = Math.max(1, container.clientHeight);
       renderer.setSize(width, height);
-      composer.setSize(width, height);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      sectionTops = [...document.querySelectorAll("main > section")].map(
-        (el) => el.offsetTop,
-      );
+      const distance = 8.3 / Math.min(camera.aspect / 0.85, 1);
+      camera.position
+        .sub(controls.target)
+        .setLength(distance)
+        .add(controls.target);
+      controls.update();
+      controls.saveState();
     };
-    const onScroll = () => {
-      const y = window.scrollY;
-      const index = Math.max(
-        0,
-        sectionTops.findLastIndex((top) => y >= top),
-      );
-      const next =
-        sectionTops[index + 1] ?? sectionTops[index] + window.innerHeight;
-      targetProgress = Math.min(
-        4,
-        index + (y - sectionTops[index]) / (next - sectionTops[index]),
-      );
+    const onKeyDown = (event) => {
+      const step = 0.12;
+      switch (event.key) {
+        case "ArrowLeft":
+          controls.rotateLeft(step);
+          break;
+        case "ArrowRight":
+          controls.rotateLeft(-step);
+          break;
+        case "ArrowUp":
+          controls.rotateUp(step);
+          break;
+        case "ArrowDown":
+          controls.rotateUp(-step);
+          break;
+        case "Home":
+          controls.reset();
+          break;
+        default:
+          return;
+      }
+      event.preventDefault();
     };
-    const onPointer = (event) =>
-      pointer.set(
-        event.clientX / window.innerWidth - 0.5,
-        event.clientY / window.innerHeight - 0.5,
-      );
     const onContextLost = (event) => {
       event.preventDefault();
       renderer.setAnimationLoop(null);
-      setStatus("unavailable");
+      if (!disposed) setStatus("unavailable");
     };
+    renderer.domElement.addEventListener("keydown", onKeyDown);
     renderer.domElement.addEventListener("webglcontextlost", onContextLost);
-    const resizeObserver = new ResizeObserver(() => {
-      resize();
-      onScroll();
-    });
+    const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
-    const contentObserver = new ResizeObserver(() => {
-      resize();
-      onScroll();
-    });
-    const main = document.querySelector("main");
-    if (main) contentObserver.observe(main);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("pointermove", onPointer, { passive: true });
     resize();
-    onScroll();
-    // rotation, horizontal position, camera distance, target height per chapter.
-    const poses = [
-      [-0.65, -0.35, 4.7, 2.0],
-      [0.55, 1.35, 6, 1.65],
-      [1.45, -1.9, 8.5, 0.45],
-      [2.5, 1.55, 6.8, 1.1],
-      [3.8, 0.25, 8.5, 0.65],
-    ];
-    rig.rotation.y = poses[0][0];
+    rig.rotation.y = -0.65;
     let lastTime = performance.now(),
       elapsed = 0;
     renderer.setAnimationLoop(() => {
@@ -197,41 +241,27 @@ export default function SculptureScene({ paused }) {
       const delta = Math.min((now - lastTime) / 1000, 0.05);
       lastTime = now;
       if (document.hidden) return;
-      if (!pause.current)
-        progress = THREE.MathUtils.damp(progress, targetProgress, 4, delta);
-      const p = progress,
-        index = Math.min(3, Math.floor(p)),
-        t = THREE.MathUtils.smoothstep(p - index, 0, 1);
-      const pose = poses[index].map((value, i) =>
-        THREE.MathUtils.lerp(value, poses[index + 1][i], t),
-      );
       if (!pause.current) elapsed += delta;
-      if (!pause.current) rig.rotation.y = pose[0] + pointer.x * 0.09;
-      rig.position.x = mobile ? pose[1] * 0.3 : pose[1];
+      controls.autoRotate = !pause.current;
+      controls.update(delta);
       rig.position.y = Math.sin(elapsed * 0.3) * 0.018;
-      ring.position.x = rig.position.x;
       ring.rotation.y = Math.sin(elapsed * 0.15) * 0.14;
-      camera.position.set(0, pose[3], mobile ? pose[2] * 1.25 : pose[2]);
-      camera.lookAt(0, pose[3], 0);
-      composer.render();
+      renderer.render(scene, camera);
     });
     return () => {
       disposed = true;
+      applyTheme.current = null;
       renderer.setAnimationLoop(null);
       resizeObserver.disconnect();
-      contentObserver.disconnect();
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("pointermove", onPointer);
+      renderer.domElement.removeEventListener("keydown", onKeyDown);
       renderer.domElement.removeEventListener(
         "webglcontextlost",
         onContextLost,
       );
-      disposeObject(scene);
-      marble.dispose();
+      controls.dispose();
+      disposeObject(scene, [marble]);
       environment.dispose();
       draco.dispose();
-      composer.passes.forEach((pass) => pass.dispose?.());
-      composer.dispose();
       renderer.dispose();
       renderer.domElement.remove();
     };
@@ -241,15 +271,18 @@ export default function SculptureScene({ paused }) {
       ref={host}
       className={`sculpture-canvas ${status}`}
       data-scene-status={status}
+      aria-busy={status === "loading"}
     >
       {status === "loading" && (
-        <span className="scene-loading">Loading sculpture</span>
+        <span className="scene-loading" role="status">
+          Loading sculpture
+        </span>
       )}
       {status === "unavailable" && (
         <img
           className="sculpture-fallback"
           src="/images/sculpture-fallback.jpg"
-          alt=""
+          alt="Classical male sculpture"
         />
       )}
     </div>
@@ -260,4 +293,8 @@ SculptureScene.propTypes = {
     typeof props[key] === "boolean"
       ? null
       : new Error("paused must be a boolean"),
+  theme: (props, key) =>
+    props[key] === undefined || props[key] === "light" || props[key] === "dark"
+      ? null
+      : new Error("theme must be light or dark"),
 };
