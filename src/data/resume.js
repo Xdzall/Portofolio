@@ -127,7 +127,7 @@ export const projects = [
       "Docker Compose",
       "GitLab CI/CD",
     ],
-    live: "https://msb.pradita.my.id",
+    live: "https://merdekasejahterabersama.com/",
     featured: true,
     points: [
       "Built portal features with Next.js App Router and Strapi, including AES-256-GCM encrypted session cookies, token rotation, and same-origin request checks.",

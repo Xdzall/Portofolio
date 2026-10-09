@@ -11,5 +11,6 @@
 - AutoChef is live at https://autochef.vercel.app/, with its Live button pointing to the deployment and the backend repository linked in the codebase.
 - Contact form opens a mailto draft to the user's own address after native and trimmed-message validation. No third-party form recipient or teammate API key is used. Sending is completed by the visitor in their email app.
 - The Three.js scene now has transparent background, drag/keyboard orbit, Home reset, pause/reduced motion, local loading/fallback assets and GPU cleanup.
+- At the user's request, explicit anatomy is removed by localized mesh smoothing. The pose, drapery and geometry outside the edited region remain intact. The fallback photo uses a non-explicit upper-body crop.
 - Static route entry files are generated after Vite build for direct links and refreshes.
 - `npm run build` and targeted ESLint passed. Browser tests and final visual results are in `design-qa.md`.

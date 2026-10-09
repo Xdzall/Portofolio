@@ -282,7 +282,7 @@ export default function SculptureScene({ paused, theme = "light" }) {
         <img
           className="sculpture-fallback"
           src="/images/sculpture-fallback.jpg"
-          alt="Classical male sculpture"
+          alt="Upper-body portrait of a classical male sculpture"
         />
       )}
     </div>

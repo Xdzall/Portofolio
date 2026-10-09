@@ -2,12 +2,13 @@ PORTFOLIO — MUHAMMAD GHAZALI NUR RAHMAN
 Visual inspiration: Musee by Max Barvian — https://musee.barvian.me/
 Interface reference: Gumiwang Gde Derazatna — https://portfolio.gugum.my.id/
 Layout, navigation, and shared project screenshots adapted from the user's team reference. Ivory/teal and forest/teal themes added at the user's request.
-AutoChef preview: user's local web_AutoChef project. Personal information and CV: Muhammad Ghazali Nur Rahman.
+AutoChef preview: user's live AutoChef project at https://autochef.vercel.app/. Personal information and CV: Muhammad Ghazali Nur Rahman.
 Sculpture: Perseus with the Head of Medusa, Antonio Canova, 1804–6.
 The Metropolitan Museum of Art, Fletcher Fund, 1967, accession 67.110.1.
 https://www.metmuseum.org/art/collection/search/204758
 Public-domain collection asset, distributed via The Met 3D viewer (Vntana).
 The marble scan is rendered with a custom warm stone material and theme-aware lighting in this portfolio.
+Explicit anatomy is removed from the rendered mesh through localized smoothing at the user's request. The fallback photo displays an upper-body crop.
 Three.js — MIT. Draco decoder — Apache-2.0. Lucide icons — ISC.
 Inter and JetBrains Mono — SIL Open Font License; license files in /fonts/.
 Social icons extracted from the public reference. Project screenshots remain credited to their respective projects.

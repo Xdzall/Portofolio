@@ -2,63 +2,71 @@
 
 final result: passed
 
-## Scope and visual evidence
+Verified 9 October 2026. No actionable P0/P1/P2 findings remain within the requested scope.
 
-Adaptation of https://musee.barvian.me/ into the existing personal portfolio, with a male sculpture as explicitly requested. This is an independent portfolio implementation, not a pixel-identical museum clone.
+## Visual truth and evidence
 
-- Source truth: `design-evidence/reference-desktop.png`, `design-evidence/reference-mobile.png`.
-- Implementation: `design-evidence/portfolio-desktop.png`, `design-evidence/portfolio-mobile.png`.
-- Combined comparison inputs, opened and visually inspected: `design-evidence/comparison-desktop.jpg`, `design-evidence/comparison-mobile.jpg`.
-- Extra interaction evidence: `design-evidence/project-mobile.png`.
-- Desktop CSS viewport: 1440 × 900. Browser screenshot exports: source 1425 × 891, implementation 1435 × 897; normalized to 1440 × 900 for comparison.
-- Mobile CSS viewport: 390 × 844. Browser screenshot exports: source 375 × 812, implementation 385 × 833; normalized to 390 × 844 for comparison. Export scaling was normalized before judging layout; it is not a site overflow issue.
-- State: home/hero, model fully loaded. Detailed projects, experience, navigation dialog, and contact were also inspected in the in-app browser.
+The five-page UI follows https://portfolio.gugum.my.id/. Own identity, Panasonic experience, AutoChef and the male Perseus sculpture are preserved. Ivory/teal and forest/teal palettes, brighter lighting and removal of explicit anatomy are intentional changes requested by the user.
 
-## Findings and comparison history
+Evidence root: `design-evidence/gugum-ui/`.
 
-1. Initial implementation: the top of Perseus was clipped and the sculpture was too bright. Camera distance/target height, model rotation, material color/roughness, and bloom were adjusted. The final desktop and mobile images show the male face and upper body clearly with a dark sculptural treatment. Resolved.
-2. Long-page navigation: the initial header disappeared after scrolling. Header now stays fixed, with a dark background over lower sections. Desktop and mobile navigation/dialog interactions were rechecked. Resolved.
-3. Pause initially returned the camera to the first pose. It now retains the current pose, stops pointer and scroll-driven motion, and resumes when enabled. The reduced-motion startup uses the intended initial rotation. Resolved.
-4. Final combined comparisons show no actionable P0/P1/P2 findings within the requested adaptation scope.
+- Source: `source-{home,about,experience,projects,contact}-{desktop,mobile}.png`.
+- Final implementation: `themes/{light,dark}-{home,about,experience,projects,contact}-{desktop,mobile}.png`.
+- Combined source/light/dark inputs opened and inspected: `themes/qa-triple-{home,about,experience,projects,contact}-{desktop,mobile}.jpg`.
+- Focused controls: `themes/qa-triple-{nav,form,card}.jpg`.
+- Focused lighting/geometry: `themes/qa-final-face.jpg`, `themes/qa-final-pelvis-angles.jpg`, `themes/qa-four-orbit.jpg`.
+- Scrolled comparisons: `themes/qa-final-{home-sculpture,about-lower,experience-lower,projects-lower,projects-menu}-mobile.jpg`.
+- Extra states: `themes/sculpture-fallback-desktop.png`, `themes/dark-contact-small.png`.
+
+Desktop captures: 1440 × 900 CSS and image pixels. Mobile: 390 × 844; narrow check: 320 × 700. Captures use density 1 and were compared without rescaling. Comparison sheets add a label strip. The user's initial screenshot uses a different viewport and identifies the lighting problem, rather than a spacing target.
+
+States include loaded home, both themes on all routes, paused orbit, lower content, RKD dropdown, contact controls and model-load failure. Focused crops were needed for small UI text, face shading and mesh continuity.
+
+## Comparison history and resolved findings
+
+1. **[P2, resolved] Sculpture detail was too dark.** Warm stone material and directional key/rim/fill lighting replace the black treatment. The first bright iteration washed out highlights; reduced exposure and ambient/fill intensity restored face, torso and cloth detail. Final face and orbit comparisons preserve shading in both themes.
+2. **[P2, resolved] Explicit anatomy remained on the scan.** Local smoothing changes 438 vertices in a small pelvis region, retains topology and welds seam vertices. The decoded-mesh check verifies unchanged positions elsewhere. Four browser angles show smooth removal without visible holes. The fallback photo uses an upper-body crop.
+3. **[P2, resolved] Mobile theme control overlapped Send Message.** It now shares the header row with navigation. Compact spacing and a Home icon keep the 44 px control visible at 320 px. Revised Contact screenshots show an unobstructed CTA.
+4. **[P2, resolved] Panasonic metadata was cramped.** Mobile company/date metadata now stacks into separate rows; revised Experience comparisons are readable.
+5. **[P2, resolved] Teal small text lacked contrast on tinted fills.** A separate accent-text token gives checked ratios of badge 5.36:1 light / 5.83:1 dark, dropdown hover 5.45 / 5.00, and placeholders 4.52 / 6.37. Muted text also exceeds 4.5:1.
+6. **[P2, resolved] Narrow navigation overflow.** Responsive spacing fits navigation and theme control within the 314 px body at a 320 px viewport.
+7. A manual theme override ref preserves the session choice when storage fails, even after a system-theme change.
+8. **[P2, resolved] Updated AutoChef landing screenshot was cropped.** Its wide image now uses `object-fit: contain` without hover enlargement, preserving the logo and heading within the project slot in both themes.
 
 ## Required fidelity surfaces
 
-- Typography: Baskerville/Times New Roman display typography follows the source serif direction. Inter replaces the source's proprietary Cera font. Large, overlapping editorial headlines and compact uppercase navigation are retained. Italic words are an intentional portfolio variation.
-- Layout: full-viewport sculptural hero, fine vertical grid, left chapter indicators, right-aligned desktop headline and narrow description. Mobile uses a single-column hero and accessible menu. No horizontal overflow was observed at 390 px.
-- Colors: near-black background, dark metallic sculpture, pale text, white halo, and small blue active-navigation accents. Halo softness and statue framing are intentionally adapted to Perseus's different silhouette.
-- Image quality: actual locally bundled 3D museum scan, not a flat imitation. Local Draco decoder and local fallback photograph. Perseus replaces Venus as requested; the male subject and its pose account for deliberate crop/composition differences. Face, sculpture surface, and text were inspected in full-size browser screenshots as well as the combined comparison.
-- Content: original profile, education, five projects, experience, programming skills, collaboration skills, spoken languages, GitHub, LinkedIn, and email retained through the shared resume data. Museum copy replaced with portfolio content. No invented employment or projects.
+- **Typography:** local Inter/JetBrains Mono preserve hierarchy, labels and card density; personal text wraps naturally. Mobile navigation is compact to accommodate the theme control.
+- **Layout:** floating pill, desktop split hero/contact, project grid, alternating experience cards and mobile stacking remain coherent. No horizontal overflow was observed at 390/1440 px; the narrow header also fits at 320 px.
+- **Colors:** both palettes cover all surfaces, borders, forms, dropdowns, icons, focus states and native form color-scheme. Requested color differences are intentional. Checked primary, secondary, placeholder and CTA text contrast passes.
+- **Assets:** the real compressed museum scan remains interactive. Face/hair/cloth details are visible. Genuine shared screenshots and social icons remain; AutoChef uses the user's own image and current Vercel link.
+- **Content:** personal identity, CV, education, Panasonic, TapInAja, AutoChef and shared team projects remain in resume data. No teammate identity or employment was substituted.
 
 ## Functional checks
 
-- Hero CTA navigates to selected work; chapter indicator updates.
-- Money Tracker details open and expose the correct repository URL.
-- AutoChef details work on mobile and expose the existing live-project URL.
-- Skill disclosure expands and displays the saved language list.
-- Navigation dialog opens; initial focus moves inside; Escape closes and returns focus. Mobile menu navigation closes the dialog and reaches the selected section.
-- Copy email reports Copied; mailto and social destinations match resume data. No email was sent.
-- Pause/resume control updates its accessible state; motion is driven by scroll/pointer when enabled.
-- Desktop and mobile 3D loading reach data-scene-status=ready.
-- GPU resources/listeners are disposed on unmount. Context loss stops the render loop and shows the local image fallback.
+- Both theme choices persist after reload and route navigation. The explicit saved choice overrides an emulated system preference change. Enter toggles the theme and its accessible state updates.
+- Initial system fallback and pre-paint bootstrap were checked in code. Storage failure retains the manual session choice.
+- Theme changes keep the scene ready. Drag/keyboard orbit, Home reset and pause work. Emulated reduced-motion startup is paused.
+- Temporarily blocking the model request shows the upper-body fallback and hides the empty canvas/orbit controls. Removing the test block and reloading restores the model.
+- Navigation/history, dropdown dismissal, email copy, required/email validation and trimmed-message validation were checked. Contact submission prepares a draft for the visitor to send; no message was sent.
+- Lower About, skills, project cards and RKD dropdown were inspected in both palettes.
 
-## Build and console
+## Build and limits
 
-- `npm run build`: passed. Vite reports a large Three.js lazy chunk (approximately 642 KB uncompressed / 165 KB gzip); the initial page bundle is approximately 54 KB gzip.
-- `npx eslint src/App.jsx src/components/3d/SculptureScene.jsx eslint.config.js`: passed.
+- Production build and static route entries: passed.
+- Targeted ESLint for App, SculptureScene, mesh helper, route-entry script and config: passed.
 - `git diff --check`: passed.
-- Repository-wide ESLint: 261 errors and 1 warning in unchanged legacy components, which are retained but no longer rendered by App. Vendor Draco code is excluded from lint.
-- During development a transient HMR syntax failure was corrected; the final code builds and loads. An environment shader precision warning appeared without affecting rendering; deprecated Clock usage was replaced.
+- Final normal-size in-app preview: home ready, dark theme active, no overflow, and no console errors returned.
+- User-facing light/dark proof: `design-evidence/gugum-ui/themes/final-preview.jpg` (1760 × 586 comparison; source captures are 1440 × 900).
+- Vite reports a roughly 646 KB lazy Three.js chunk / 166 KB gzip. The scene remains lazy-loaded.
+- Repository-wide lint includes pre-existing legacy-component errors; changed files pass.
+- Hardware-specific GPU failures were not exhaustively simulated. Model-load failure was tested; WebGL creation/context-loss handling was reviewed.
 
-## Residual test limits
+No deployment was performed. Local preview: http://127.0.0.1:5173/.
 
-Hardware-specific WebGL failures and OS-level reduced-motion emulation were not forced in browser automation. Fallback paths and reduced-motion initialization were reviewed in code. Mail clients and external project availability were not tested by submitting anything. Further asset simplification could reduce download size, but is optional polish.
+## Checklist
 
-## Implementation checklist
-
-- [x] Replace space theme with sculptural editorial portfolio.
-- [x] Use an actual male statue in Three.js.
-- [x] Preserve portfolio content and working navigation/contact links.
-- [x] Verify desktop and mobile visual composition and primary controls.
-- [x] Keep the local preview available; do not deploy without a publishing request.
-
-Final clean-tab verification: scene ready, no horizontal overflow, and zero console errors in a newly opened preview tab. Preview remains open at http://127.0.0.1:5173/.
+- [x] Preserve reference UI and personal content.
+- [x] Add persistent light/dark themes.
+- [x] Improve lighting without blown highlights.
+- [x] Remove explicit anatomy in the rendered mesh and fallback view.
+- [x] Verify responsive controls, orbit angles and production build.
