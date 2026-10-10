@@ -1,0 +1,17 @@
+{
+  "viewport": 390,
+  "requests": [
+    "http://127.0.0.1:4174/",
+    "http://127.0.0.1:4174/fonts/inter-latin.woff2",
+    "http://127.0.0.1:4174/assets/index-CKySOa7G.js",
+    "http://127.0.0.1:4174/assets/index-CQvn-Sjn.css",
+    "http://127.0.0.1:4174/icons/icon-linkedin.svg",
+    "http://127.0.0.1:4174/icons/icon-github.svg",
+    "http://127.0.0.1:4174/icons/icon-whatsapp.svg",
+    "http://127.0.0.1:4174/icons/icon-email.svg",
+    "http://127.0.0.1:4174/images/sculpture-poster-light.webp",
+    "http://127.0.0.1:4174/favicon.svg"
+  ],
+  "sceneRequests": [],
+  "canvasCount": 0
+}

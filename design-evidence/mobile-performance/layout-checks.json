@@ -1,0 +1,142 @@
+[
+  {
+    "inputSize": null,
+    "navWidth": 245.015625,
+    "overflow": false,
+    "page": "Home",
+    "width": 320
+  },
+  {
+    "inputSize": null,
+    "navWidth": 245.015625,
+    "overflow": false,
+    "page": "About",
+    "width": 320
+  },
+  {
+    "inputSize": null,
+    "navWidth": 245.015625,
+    "overflow": false,
+    "page": "Experience",
+    "width": 320
+  },
+  {
+    "inputSize": null,
+    "navWidth": 245.015625,
+    "overflow": false,
+    "page": "Projects",
+    "width": 320
+  },
+  {
+    "inputSize": "16px",
+    "navWidth": 245.015625,
+    "overflow": false,
+    "page": "Contact",
+    "width": 320
+  },
+  {
+    "inputSize": null,
+    "navWidth": 308.09375,
+    "overflow": false,
+    "page": "Home",
+    "width": 390
+  },
+  {
+    "inputSize": null,
+    "navWidth": 308.09375,
+    "overflow": false,
+    "page": "About",
+    "width": 390
+  },
+  {
+    "inputSize": null,
+    "navWidth": 308.09375,
+    "overflow": false,
+    "page": "Experience",
+    "width": 390
+  },
+  {
+    "inputSize": null,
+    "navWidth": 308.09375,
+    "overflow": false,
+    "page": "Projects",
+    "width": 390
+  },
+  {
+    "inputSize": "16px",
+    "navWidth": 308.09375,
+    "overflow": false,
+    "page": "Contact",
+    "width": 390
+  },
+  {
+    "inputSize": null,
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "Home",
+    "width": 768
+  },
+  {
+    "inputSize": null,
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "About",
+    "width": 768
+  },
+  {
+    "inputSize": null,
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "Experience",
+    "width": 768
+  },
+  {
+    "inputSize": null,
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "Projects",
+    "width": 768
+  },
+  {
+    "inputSize": "14px",
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "Contact",
+    "width": 768
+  },
+  {
+    "inputSize": null,
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "Home",
+    "width": 1440
+  },
+  {
+    "inputSize": null,
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "About",
+    "width": 1440
+  },
+  {
+    "inputSize": null,
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "Experience",
+    "width": 1440
+  },
+  {
+    "inputSize": null,
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "Projects",
+    "width": 1440
+  },
+  {
+    "inputSize": "14px",
+    "navWidth": 414.8125,
+    "overflow": false,
+    "page": "Contact",
+    "width": 1440
+  }
+]

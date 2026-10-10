@@ -1,6 +1,7 @@
-@import "tailwindcss";
-@source not "../tmp";
-@source not "../output";
+@import "tailwindcss" source(none);
+@source "./App.jsx";
+@source "./main.jsx";
+@source "./components/3d/SculptureScene.jsx";
 @font-face {
   font-family: "Inter";
   font-style: normal;
@@ -238,6 +239,7 @@ p {
 }
 .pill-nav {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -255,6 +257,7 @@ p {
 }
 .pill-nav > a {
   position: relative;
+  z-index: 1;
   isolation: isolate;
   padding: 6px 8px;
   border-radius: 999px;
@@ -279,13 +282,25 @@ p {
 }
 .pill-nav .nav-pill {
   position: absolute;
-  z-index: -1;
-  inset: 0;
+  z-index: 0;
+  top: 6px;
+  bottom: 6px;
+  left: 6px;
+  width: var(--pill-width, 0px);
+  transform: translateX(var(--pill-x, 0px));
+  visibility: hidden;
   border-radius: 999px;
   background: var(--solid-bg);
   box-shadow:
     0 4px 6px -1px var(--shadow-medium),
     0 2px 4px -2px var(--shadow-medium);
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 180ms ease;
+}
+.pill-nav[data-pill-ready="true"] .nav-pill {
+  visibility: visible;
 }
 .page-shell {
   position: relative;
@@ -421,6 +436,104 @@ p {
   filter: blur(64px);
   pointer-events: none;
 }
+.sculpture-poster {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.sculpture-panel:has(.sculpture-canvas.ready) .sculpture-poster {
+  visibility: hidden;
+}
+.scene-preview {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 20px 16px;
+  pointer-events: none;
+}
+.scene-preview-caption,
+.scene-unavailable-message {
+  max-width: 320px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+.scene-preview-caption {
+  padding: 6px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  background: var(--surface-raised);
+}
+.scene-enable {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--solid-bg);
+  color: var(--solid-ink);
+  box-shadow: 0 2px 8px var(--shadow-medium);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  pointer-events: auto;
+}
+.scene-enable:hover {
+  background: var(--solid-hover);
+}
+.scene-enable svg {
+  width: 16px;
+  height: 16px;
+}
+.scene-controls {
+  position: absolute;
+  z-index: 3;
+  bottom: 8px;
+  left: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 16px);
+}
+.scene-controls .motion-control {
+  position: static;
+}
+.scene-still-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: var(--surface-card);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 14px;
+}
+.scene-still-button:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.scene-still-button svg {
+  width: 12px;
+  height: 12px;
+}
 .sculpture-canvas {
   position: relative;
   z-index: 1;
@@ -469,7 +582,7 @@ p {
   visibility: hidden;
 }
 .sculpture-panel:has(.sculpture-canvas.unavailable)
-  :is(.motion-control, .sculpture-hint) {
+  :is(.scene-controls, .motion-control, .sculpture-hint) {
   display: none;
 }
 .sculpture-hint {
@@ -852,11 +965,11 @@ p {
 .project-card:hover .project-image img {
   transform: scale(1.05);
 }
-.project-image img[src="/projects/autochef-screen.png"] {
+.project-image img[src*="/projects/autochef-screen"] {
   object-fit: contain;
   object-position: center;
 }
-.project-card:hover .project-image img[src="/projects/autochef-screen.png"] {
+.project-card:hover .project-image img[src*="/projects/autochef-screen"] {
   transform: none;
 }
 .project-card-heading {
@@ -1595,9 +1708,130 @@ summary.project-link::-webkit-details-marker {
     font-size: 60px;
   }
 }
+@media (max-width: 767px) {
+  :root {
+    --surface-nav: #fffef7;
+    --surface-card: #fdfcf5;
+    --surface-soft: #f9f8f1;
+    --surface-raised: #fffef7;
+  }
+  :root[data-theme="dark"] {
+    --surface-nav: #1b2e27;
+    --surface-card: #1b2e27;
+    --surface-soft: #182920;
+    --surface-raised: #20382f;
+  }
+  body,
+  #root,
+  .page-shell {
+    min-height: 100svh;
+  }
+  .page-shell {
+    padding-top: calc(80px + env(safe-area-inset-top, 0px));
+    padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+  }
+  .home-page,
+  .contact-page,
+  .content-page {
+    min-height: calc(100svh - 104px);
+  }
+  .site-header {
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+  }
+  .pill-nav > a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+  }
+  .ambient-light {
+    height: 320px;
+  }
+  .ambient-light::before {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      var(--ambient-primary),
+      var(--ambient-secondary) 35%,
+      transparent 75%
+    );
+    filter: none;
+    transform: none;
+  }
+  .sculpture-panel::before {
+    background: radial-gradient(
+      ellipse at center,
+      var(--ambient-primary),
+      var(--ambient-secondary) 45%,
+      transparent 72%
+    );
+    filter: none;
+  }
+  .pill-nav,
+  .theme-toggle,
+  .motion-control,
+  .experience-card,
+  .skill-card,
+  .project-card,
+  .project-links-dropdown,
+  .email-copy,
+  .contact-form {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .download-button,
+  .submit-button,
+  .email-copy button,
+  .motion-control,
+  .scene-still-button {
+    min-height: 44px;
+  }
+  .social-links a {
+    width: 44px;
+    height: 44px;
+  }
+  .social-links img {
+    width: 14px;
+    height: 14px;
+  }
+  .project-link {
+    min-height: 40px;
+  }
+  .project-card:hover .project-image img {
+    transform: none;
+  }
+  .form-field input,
+  .form-field textarea {
+    font-size: 16px;
+    line-height: 22px;
+  }
+  .form-field input {
+    min-height: 44px;
+  }
+  .scene-controls {
+    gap: 6px;
+  }
+  .scene-controls .motion-control,
+  .scene-still-button {
+    padding-inline: 12px;
+    font-size: 11px;
+    line-height: 16px;
+  }
+  .sculpture-hint {
+    top: 12px;
+    right: 12px;
+    bottom: auto;
+  }
+}
 @media (max-width: 359px) {
   .site-header {
-    padding-inline: 8px;
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: max(8px, env(safe-area-inset-right, 0px));
   }
   .pill-nav {
     gap: 0;

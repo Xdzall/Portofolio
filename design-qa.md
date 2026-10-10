@@ -70,3 +70,30 @@ No deployment was performed. Local preview: http://127.0.0.1:5173/.
 - [x] Improve lighting without blown highlights.
 - [x] Remove explicit anatomy in the rendered mesh and fallback view.
 - [x] Verify responsive controls, orbit angles and production build.
+
+## Mobile performance and reliability follow-up
+
+The same male sculpture remains available. Mobile, coarse-pointer, low-memory, and data-saving clients start with a themed still preview and an explicit Enable 3D button. The initial mobile production request trace contains no SculptureScene chunk, model, or Draco download. Desktop still loads the scene automatically near the viewport. Returning to Still view removes the canvas and releases its WebGL context.
+
+Measured build and asset changes:
+
+| Asset | Before | After |
+| --- | ---: | ---: |
+| Main JavaScript | approximately 299 KB | 178.08 KB / 57.58 KB gzip |
+| Styles | approximately 61 KB | 35.84 KB / 7.84 KB gzip |
+| Four project previews | 2,295,935 bytes | 138,702 bytes; 69,416 bytes for 640px variants |
+| Sculpture still previews | No lightweight full-pose preview | 19,346 bytes light; 17,378 bytes dark |
+
+The current page no longer imports Framer Motion. Its active navbar indicator retains the sliding animation using a 300ms CSS transform/width transition. Browser checks confirmed it moves between the active links, and reduced-motion emulation reduces the transition duration. ResizeObserver keeps its position aligned when the nav changes size.
+
+All five pages were checked at 320, 390, 768, and 1440px with no horizontal overflow. Mobile contact fields use 16px text and 44px controls; large blur/backdrop effects are removed on mobile. Project images request responsive WebP variants, reserve dimensions, and decode asynchronously. AutoChef retains its contained preview layout.
+
+Real browser rendering checks: mobile DPR is 1; a paused scene rendered once and remained at count 1 until keyboard orbit; damping completed and returned to idle. With animation enabled, moving the entire scene outside the viewport changed its mode to hidden and its count remained at 270 across observations. Mobile rendering is capped at 30 fps. Seven deterministic scheduler tests cover static frames, theme invalidation, 30/60 fps caps on 60/120Hz displays, visibility, damping, and cleanup.
+
+Blocking the GLB request preserved the preview, removed the canvas, and showed Retry 3D. Clearing the block and retrying restored a ready scene. Blocking the scene JavaScript chunk was contained by an error boundary: navigation remained functional and Reload page cleared the browser's cached failed import; enabling 3D then succeeded. Load timeouts, decoder cleanup, fetch cancellation, and context-loss cleanup were reviewed. A device/connection event preserves ready status when the enablement choice has not changed.
+
+The favicon now uses the actual Lucide BriefcaseBusiness glyph, with SVG, 32px PNG, and 180px Apple touch variants. Both preview images are captured from the edited model, including its smoothed pelvis; their alpha channels match the source PNGs exactly. Light/dark theme changes and reduced-motion startup were verified.
+
+Final checks: production build, targeted ESLint, all 7 scheduler tests, and git diff whitespace check passed. The lazy Three.js vendor chunk remains approximately 649 KB / 167 KB gzip and generates Vite's size advisory; it is not requested by the default mobile view. This is browser-based validation, not a benchmark on every physical phone.
+
+Evidence: `design-evidence/mobile-performance/` contains mobile light/dark screenshots, desktop light screenshot, source poster captures, layout results, and the initial mobile request trace. The local production preview used port 4174; development preview used 5174.

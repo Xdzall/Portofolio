@@ -1,5 +1,13 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { motion, MotionConfig } from "framer-motion";
+import {
+  Component,
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -10,6 +18,8 @@ import {
   Sun,
   Moon,
   House,
+  Box,
+  Image,
 } from "lucide-react";
 import {
   profile,
@@ -19,7 +29,6 @@ import {
   skills,
 } from "./data/resume";
 
-const SculptureScene = lazy(() => import("./components/3d/SculptureScene"));
 const pages = [
   ["/", "Home"],
   ["/about", "About"],
@@ -28,10 +37,10 @@ const pages = [
   ["/contact", "Contact"],
 ];
 const projectImages = {
-  TapInAja: "/projects/tapinaja.png",
-  "PT Merdeka Sejahtera": "/projects/merdeka-sejahtera.png",
-  AutoChef: "/projects/autochef-screen.png",
-  "RKD Foundation Web Ecosystem": "/projects/rkd.png",
+  TapInAja: ["tapinaja", 1024, 489],
+  "PT Merdeka Sejahtera": ["merdeka-sejahtera", 1024, 489],
+  AutoChef: ["autochef-screen", 1280, 640],
+  "RKD Foundation Web Ecosystem": ["rkd", 1024, 476],
 };
 const skillGroups = [
   [
@@ -96,6 +105,34 @@ const validateString = (props, key) =>
   typeof props[key] === "string" ? null : new Error(key + " must be a string");
 const validateArray = (props, key) =>
   Array.isArray(props[key]) ? null : new Error(key + " must be an array");
+const validateFunction = (props, key) =>
+  typeof props[key] === "function"
+    ? null
+    : new Error(key + " must be a function");
+
+function prefersStillSculpture() {
+  const connection = navigator.connection;
+  return (
+    window.matchMedia("(max-width: 767px), (pointer: coarse)").matches ||
+    connection?.saveData ||
+    ["slow-2g", "2g"].includes(connection?.effectiveType) ||
+    (navigator.deviceMemory !== undefined && navigator.deviceMemory <= 4)
+  );
+}
+
+class SceneBoundary extends Component {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch() {
+    this.props.onError();
+  }
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+SceneBoundary.propTypes = { onError: validateFunction, children: () => null };
 
 function currentRoute() {
   const legacy = {
@@ -180,9 +217,85 @@ PageHeading.propTypes = {
 };
 
 function HomePage({ theme }) {
-  const [paused, setPaused] = useState(
-    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  const capturePoster =
+    import.meta.env.DEV &&
+    new URLSearchParams(window.location.search).has("capturePoster");
+  const panelRef = useRef(null);
+  const manualSceneChoice = useRef(false);
+  const [sceneEnabled, setSceneEnabled] = useState(
+    () => capturePoster || !prefersStillSculpture(),
   );
+  const [nearViewport, setNearViewport] = useState(false);
+  const [sceneStatus, setSceneStatus] = useState("loading");
+  const [moduleFailed, setModuleFailed] = useState(false);
+  const [sceneModule, setSceneModule] = useState(() => ({
+    key: 0,
+    Component: lazy(() => import("./components/3d/SculptureScene")),
+  }));
+  const SculptureScene = sceneModule.Component;
+  const [paused, setPaused] = useState(
+    () =>
+      capturePoster ||
+      prefersStillSculpture() ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const handleSceneError = useCallback(() => {
+    setModuleFailed(true);
+    setSceneStatus("unavailable");
+  }, []);
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) {
+      setNearViewport(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setNearViewport(true);
+        observer.disconnect();
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(panelRef.current);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px), (pointer: coarse)");
+    const syncDevice = () => {
+      if (manualSceneChoice.current || capturePoster) return;
+      const nextEnabled = !prefersStillSculpture();
+      if (nextEnabled === sceneEnabled) return;
+      setSceneEnabled(nextEnabled);
+      setSceneStatus("loading");
+      if (prefersStillSculpture()) setPaused(true);
+    };
+    media.addEventListener("change", syncDevice);
+    navigator.connection?.addEventListener("change", syncDevice);
+    return () => {
+      media.removeEventListener("change", syncDevice);
+      navigator.connection?.removeEventListener("change", syncDevice);
+    };
+  }, [capturePoster, sceneEnabled]);
+  const enableScene = () => {
+    if (moduleFailed) {
+      // Browsers cache failed module imports until the document is reloaded.
+      window.location.reload();
+      return;
+    }
+    manualSceneChoice.current = true;
+    setSceneStatus("loading");
+    setSceneModule((value) => ({
+      key: value.key + 1,
+      Component: lazy(() => import("./components/3d/SculptureScene")),
+    }));
+    setSceneEnabled(true);
+  };
+  const showStill = () => {
+    manualSceneChoice.current = true;
+    setSceneEnabled(false);
+    setSceneStatus("loading");
+  };
+  const ready = sceneEnabled && sceneStatus === "ready";
   return (
     <section className="home-page" aria-label="Introduction">
       <div className="home-copy">
@@ -198,29 +311,86 @@ function HomePage({ theme }) {
         </a>
         <SocialLinks includeContact />
       </div>
-      <div className="sculpture-panel">
-        <Suspense
-          fallback={
-            <div className="scene-loading" role="status">
-              Loading sculpture…
+      <div
+        className="sculpture-panel"
+        ref={panelRef}
+        data-view={ready ? "interactive" : "preview"}
+      >
+        {!ready && (
+          <img
+            className="sculpture-poster"
+            src={`/images/sculpture-poster-${theme}.webp`}
+            alt="Classical male sculpture with a decorative halo"
+            width="488"
+            height="720"
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+        {sceneEnabled && nearViewport && sceneStatus !== "unavailable" && (
+          <SceneBoundary key={sceneModule.key} onError={handleSceneError}>
+            <Suspense fallback={null}>
+              <SculptureScene
+                paused={paused}
+                theme={theme}
+                onStatusChange={setSceneStatus}
+              />
+            </Suspense>
+          </SceneBoundary>
+        )}
+        {!ready && (
+          <div className="scene-preview">
+            <p className="scene-preview-caption" role="status">
+              {sceneEnabled && sceneStatus !== "unavailable"
+                ? "Loading interactive sculpture…"
+                : sceneStatus === "unavailable"
+                  ? "3D is unavailable. You can still explore the portfolio."
+                  : "Explore the sculpture in 3D"}
+            </p>
+            {(!sceneEnabled || sceneStatus === "unavailable") && (
+              <button
+                className="scene-enable"
+                type="button"
+                onClick={enableScene}
+              >
+                <Box size={16} />
+                {moduleFailed
+                  ? "Reload page"
+                  : sceneStatus === "unavailable"
+                    ? "Retry 3D"
+                    : "Enable 3D"}
+              </button>
+            )}
+          </div>
+        )}
+        {ready && (
+          <>
+            <div className="sculpture-hint">Interactive 3D · Drag to orbit</div>
+            <div className="scene-controls">
+              <button
+                type="button"
+                className="motion-control"
+                aria-pressed={paused}
+                aria-label={
+                  paused
+                    ? "Enable sculpture animation"
+                    : "Pause sculpture animation"
+                }
+                onClick={() => setPaused((value) => !value)}
+              >
+                {paused ? <Play size={12} /> : <Pause size={12} />}{" "}
+                {paused ? "Motion off" : "Motion on"}
+              </button>
+              <button
+                type="button"
+                className="scene-still-button"
+                onClick={showStill}
+              >
+                <Image size={12} /> Still view
+              </button>
             </div>
-          }
-        >
-          <SculptureScene paused={paused} theme={theme} />
-        </Suspense>
-        <div className="sculpture-hint">Interactive 3D · Drag to orbit</div>
-        <button
-          type="button"
-          className="motion-control"
-          aria-pressed={paused}
-          aria-label={
-            paused ? "Enable sculpture animation" : "Pause sculpture animation"
-          }
-          onClick={() => setPaused((value) => !value)}
-        >
-          {paused ? <Play size={12} /> : <Pause size={12} />}{" "}
-          {paused ? "Motion off" : "Motion on"}
-        </button>
+          </>
+        )}
       </div>
     </section>
   );
@@ -376,9 +546,14 @@ function ProjectsPage() {
           <article className="project-card" key={project.name}>
             <div className="project-image">
               <img
-                src={projectImages[project.name]}
+                src={`/projects/${projectImages[project.name][0]}.webp`}
+                srcSet={`/projects/${projectImages[project.name][0]}-640.webp 640w, /projects/${projectImages[project.name][0]}.webp ${projectImages[project.name][1]}w`}
+                sizes="(min-width: 1280px) 680px, (min-width: 1024px) 50vw, (min-width: 768px) 80vw, 100vw"
                 alt={project.name + " application preview"}
                 loading="lazy"
+                decoding="async"
+                width={projectImages[project.name][1]}
+                height={projectImages[project.name][2]}
               />
             </div>
             <div className="project-card-heading">
@@ -584,7 +759,22 @@ export default function App() {
     document.documentElement.dataset.theme === "dark" ? "dark" : "light",
   );
   const mainRef = useRef(null);
+  const navRef = useRef(null);
   const manualTheme = useRef(false);
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    const positionPill = () => {
+      const activeLink = nav.querySelector('[aria-current="page"]');
+      if (!activeLink) return;
+      nav.style.setProperty("--pill-x", `${activeLink.offsetLeft - 6}px`);
+      nav.style.setProperty("--pill-width", `${activeLink.offsetWidth}px`);
+      nav.dataset.pillReady = "true";
+    };
+    positionPill();
+    const observer = new ResizeObserver(positionPill);
+    observer.observe(nav);
+    return () => observer.disconnect();
+  }, [route]);
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
@@ -664,65 +854,53 @@ export default function App() {
     mainRef.current?.focus({ preventScroll: true });
   };
   return (
-    <MotionConfig reducedMotion="user">
-      <div onClick={navigate}>
-        <a href="#main" className="skip-link">
-          Skip to content
-        </a>
-        <div className="ambient-light" aria-hidden="true" />
-        <header className="site-header">
-          <nav className="pill-nav" aria-label="Main navigation">
-            {pages.map(([path, label]) => (
-              <a
-                key={path}
-                href={path}
-                aria-label={label}
-                aria-current={route === path ? "page" : undefined}
-              >
-                {route === path && (
-                  <motion.span
-                    className="nav-pill"
-                    layoutId="active-page"
-                    transition={{ type: "spring", stiffness: 210, damping: 20 }}
-                  />
-                )}
-                {path === "/" && (
-                  <House
-                    className="nav-home-icon"
-                    size={16}
-                    aria-hidden="true"
-                  />
-                )}
-                <span className={path === "/" ? "nav-home-label" : undefined}>
-                  {label}
-                </span>
-              </a>
-            ))}
-          </nav>
-          <button
-            type="button"
-            className="theme-toggle"
-            onClick={toggleTheme}
-            aria-label={
-              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-            }
-            aria-pressed={theme === "dark"}
-            title={
-              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-            }
-          >
-            {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-            <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
-          </button>
-        </header>
-        <main className="page-shell" id="main" ref={mainRef} tabIndex={-1}>
-          {route === "/" && <HomePage theme={theme} />}
-          {route === "/about" && <AboutPage />}
-          {route === "/experience" && <ExperiencePage />}
-          {route === "/projects" && <ProjectsPage />}
-          {route === "/contact" && <ContactPage />}
-        </main>
-      </div>
-    </MotionConfig>
+    <div onClick={navigate}>
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
+      <div className="ambient-light" aria-hidden="true" />
+      <header className="site-header">
+        <nav className="pill-nav" aria-label="Main navigation" ref={navRef}>
+          <span className="nav-pill" aria-hidden="true" />
+          {pages.map(([path, label]) => (
+            <a
+              key={path}
+              href={path}
+              aria-label={label}
+              aria-current={route === path ? "page" : undefined}
+            >
+              {path === "/" && (
+                <House className="nav-home-icon" size={16} aria-hidden="true" />
+              )}
+              <span className={path === "/" ? "nav-home-label" : undefined}>
+                {label}
+              </span>
+            </a>
+          ))}
+        </nav>
+        <button
+          type="button"
+          className="theme-toggle"
+          onClick={toggleTheme}
+          aria-label={
+            theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+          }
+          aria-pressed={theme === "dark"}
+          title={
+            theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+          }
+        >
+          {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+          <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+        </button>
+      </header>
+      <main className="page-shell" id="main" ref={mainRef} tabIndex={-1}>
+        {route === "/" && <HomePage theme={theme} />}
+        {route === "/about" && <AboutPage />}
+        {route === "/experience" && <ExperiencePage />}
+        {route === "/projects" && <ProjectsPage />}
+        {route === "/contact" && <ContactPage />}
+      </main>
+    </div>
   );
 }
