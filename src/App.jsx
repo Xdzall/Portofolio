@@ -153,11 +153,6 @@ function SocialLinks({ includeContact = false }) {
   const links = [
     ["LinkedIn", profile.linkedin, "linkedin"],
     ["GitHub", profile.github, "github"],
-    [
-      "WhatsApp",
-      "https://wa.me/" + profile.phone.replace(/\D/g, ""),
-      "whatsapp",
-    ],
     ...(includeContact ? [["Contact", "/contact", "email"]] : []),
   ];
   return (
@@ -418,7 +413,7 @@ function AboutPage() {
         <div className="education-detail">
           <span className="detail-label">Education</span>
           <div className="gpa-value">
-            3.56 <small>/ 4.00 GPA</small>
+            3.57 <small>/ 4.00 GPA</small>
           </div>
           <h3>Politeknik Elektronika Negeri Surabaya (PENS)</h3>
           <p>
@@ -430,7 +425,7 @@ function AboutPage() {
           <div>
             <h4>Full Stack & Manufacturing Systems</h4>
             <p>
-              ASP.NET, Blazor, PostgreSQL, SQL Server, and production workflows.
+              ASP.NET, Blazor, SQL Server, IIS, and production workflows.
             </p>
           </div>
           <div>

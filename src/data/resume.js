@@ -2,7 +2,6 @@ export const profile = {
   name: "Muhammad Ghazali Nur Rahman",
   title: "Full Stack Developer",
   email: "mghazalinurrahman939@gmail.com",
-  phone: "+6282114706173",
   linkedin: "https://linkedin.com/in/ghazali10",
   github: "https://github.com/Xdzall",
   website: "https://portofolio.mghazali.my.id",
@@ -14,7 +13,7 @@ export const education = {
   institution:
     "Electronic Engineering Polytechnic Institute of Surabaya (PENS)",
   period: "2023 - 2026",
-  gpa: "3.56 / 4.0",
+  gpa: "3.57 / 4.0",
   degree: "Associate Degree in Informatics Engineering (A.Md.Kom) - Graduated",
 };
 
@@ -29,14 +28,14 @@ export const experience = [
       "ASP.NET Core",
       "Blazor",
       "SQL Server",
-      "PostgreSQL",
+      "Entity Framework Core",
+      "SignalR",
       "IIS",
-      "Docker",
     ],
     points: [
       "Built production monitoring and material control applications with ASP.NET MVC and SQL Server, including real-time Target Unit dashboards and automated reporting.",
-      "Developing a warehouse and vendor control system covering stock visibility, material requests, deliveries, partial receiving, and reporting.",
-      "Building a Blazor web application, ASP.NET Core API, and background worker with PostgreSQL and Entity Framework Core.",
+      "Delivered a warehouse and vendor control system covering stock visibility, material requests, deliveries, partial receiving, ERP integration, and reporting, now installed on the company's IIS server for user acceptance testing.",
+      "Built it as a .NET 10 Blazor web application, ASP.NET Core API, and in-process background worker on SQL Server with Entity Framework Core, local JWT accounts, SignalR, and xUnit/bUnit test suites.",
       "Designed responsive interfaces and supported server configuration, IIS deployment, troubleshooting, and application testing.",
     ],
   },

@@ -1869,3 +1869,18 @@ summary.project-link::-webkit-details-marker {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Static text rendered into each route's HTML at build time for crawlers and
+   link previews. React replaces it on mount. */
+.static-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 96px 16px 64px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.static-page nav { margin-bottom: 32px; color: var(--muted); }
+.static-page a { color: var(--accent-text); }
+.static-page h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; }
+.static-page h2, .static-page h3 { margin: 24px 0 8px; }
+.static-page ul { padding-left: 20px; }

@@ -11,7 +11,7 @@ export default function About() {
     { label: 'Projects', value: '5+' },
     { label: 'Languages', value: '8+' },
     { label: 'Industry Exp', value: '1 yr' },
-    { label: 'GPA', value: education?.gpa?.split(' ')?.[0] || '3.56' },
+    { label: 'GPA', value: education?.gpa?.split(' ')?.[0] || '3.57' },
   ];
 
   return (
@@ -71,7 +71,7 @@ export default function About() {
             
             <div className="space-y-4 text-[#a1a1aa] mb-10 text-base md:text-lg leading-relaxed">
               <p>
-                Hello! I'm <strong className="text-[#e4e4e7]">{profile?.name}</strong>, an Informatics Engineering student at <strong className="text-[#00d4aa]">{education?.institution || 'PENS'}</strong> with a GPA of <strong className="text-[#00d4aa]">{education?.gpa || '3.56 / 4.0'}</strong>.
+                Hello! I'm <strong className="text-[#e4e4e7]">{profile?.name}</strong>, an Informatics Engineering student at <strong className="text-[#00d4aa]">{education?.institution || 'PENS'}</strong> with a GPA of <strong className="text-[#00d4aa]">{education?.gpa || '3.57 / 4.0'}</strong>.
               </p>
               <p>
                 I have a strong foundation in full-stack development, spanning modern frontend frameworks, scalable backend architectures, and database systems. Having developed production-level monitoring dashboards at <span className="text-[#e4e4e7]">PT Panasonic</span> and built AI/NLP powered web apps, I strive to deliver performant and intuitive digital experiences.
